@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import User from "../models/user";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { z } from "zod";
 
 export async function signUp(req: Request, res: Response, next: NextFunction) {
   const name = req.body.name;
@@ -48,3 +49,21 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
   res.status(200).json({ token: token, userId: user._id.toString() });
 }
+
+export const dataSchema = z.object({
+  body: z.object({
+    name: z.string({
+      required_error: "Name is required !",
+    }),
+    email: z
+      .string({
+        required_error: "Email is required !",
+      })
+      .email({ message: "Must be a valid email" }),
+    password: z
+      .string({
+        required_error: "Password is required !",
+      })
+      .min(5),
+  }),
+});

@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.signUp = void 0;
+exports.dataSchema = exports.login = exports.signUp = void 0;
 const user_1 = __importDefault(require("../models/user"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const zod_1 = require("zod");
 function signUp(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const name = req.body.name;
@@ -58,3 +59,20 @@ function login(req, res, next) {
     });
 }
 exports.login = login;
+exports.dataSchema = zod_1.z.object({
+    body: zod_1.z.object({
+        name: zod_1.z.string({
+            required_error: "Name is required !",
+        }),
+        email: zod_1.z
+            .string({
+            required_error: "Email is required !",
+        })
+            .email({ message: "Must be a valid email" }),
+        password: zod_1.z
+            .string({
+            required_error: "Password is required !",
+        })
+            .min(5),
+    }),
+});
