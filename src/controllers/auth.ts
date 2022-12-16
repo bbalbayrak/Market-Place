@@ -27,6 +27,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
     .status(200)
     .json({ message: "User successfully created", user: user });
 }
+
 export async function login(req: Request, res: Response, next: NextFunction) {
   const email = req.body.email;
   const password = req.body.password;

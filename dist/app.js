@@ -7,12 +7,16 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const user_1 = __importDefault(require("./routes/user"));
+const product_1 = __importDefault(require("./routes/product"));
+const admin_1 = __importDefault(require("./routes/admin"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config({ path: "./.env" });
 const MONGODB_URI = process.env.API_URL;
 const app = (0, express_1.default)();
 app.use(body_parser_1.default.json());
 app.use("/auth", user_1.default);
+app.use("/admin", admin_1.default);
+app.use(product_1.default);
 // app.use((req, res, next) => {
 //   res.send("dfsdfsdf");
 //   next();

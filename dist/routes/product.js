@@ -4,11 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const auth_1 = require("../controllers/auth");
-const validation_1 = __importDefault(require("../middleware/validation"));
+// import checkIsAuth from "../middleware/authCheck";
+const product_1 = require("../controllers/product");
+const authCheck_1 = __importDefault(require("../middleware/authCheck"));
 const router = (0, express_1.Router)();
-//User Sign Up
-router.post("/signup", auth_1.signUp, (0, validation_1.default)(auth_1.dataSchema));
-//User Login
-router.post("/login", auth_1.login, (0, validation_1.default)(auth_1.dataSchema));
+//GET PRODUCTS
+router.get("/", authCheck_1.default, product_1.getProducts);
 exports.default = router;

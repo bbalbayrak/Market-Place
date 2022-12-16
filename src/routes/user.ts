@@ -1,7 +1,7 @@
 import { Router } from "express";
 import User from "../models/user";
 import bcrypt from "bcrypt";
-import { login, signUp, dataSchema } from "../controllers/user";
+import { login, signUp, dataSchema } from "../controllers/auth";
 import validate from "../middleware/validation";
 
 const router = Router();

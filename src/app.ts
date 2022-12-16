@@ -1,13 +1,11 @@
-import express, {
-  ErrorRequestHandler,
-  NextFunction,
-  Request,
-  Response,
-} from "express";
+import express, { NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import userRoute from "./routes/user";
+import productRoute from "./routes/product";
+import adminRoute from "./routes/admin";
 import dotenv from "dotenv";
+import { JwtPayload } from "jsonwebtoken";
 
 dotenv.config({ path: "./.env" });
 
@@ -23,6 +21,7 @@ declare global {
   namespace Express {
     export interface Request {
       userId: string;
+      user: string | JwtPayload;
     }
   }
 }
@@ -34,10 +33,8 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use("/auth", userRoute);
-// app.use((req, res, next) => {
-//   res.send("dfsdfsdf");
-//   next();
-// });
+app.use("/admin", adminRoute);
+app.use(productRoute);
 
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   console.log(error);
