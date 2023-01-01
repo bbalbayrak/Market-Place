@@ -17,10 +17,6 @@ app.use(body_parser_1.default.json());
 app.use("/auth", user_1.default);
 app.use("/admin", admin_1.default);
 app.use(product_1.default);
-// app.use((req, res, next) => {
-//   res.send("dfsdfsdf");
-//   next();
-// });
 app.use((error, req, res, next) => {
     console.log(error);
     const status = error.statusCode || 500;

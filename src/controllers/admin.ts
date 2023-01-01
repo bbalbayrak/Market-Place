@@ -62,3 +62,81 @@ export async function postAdminProducts(
     next(error);
   }
 }
+
+export async function postChangeRole(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = req.userId;
+  const roleChangeId = req.params.userUpdate;
+  const role = req.body.role;
+
+  //ADMIN CHECK
+  const adminUser = await User.findById(userId);
+  if (!adminUser) {
+    return res.status(404).json({ message: "User can not found" });
+  }
+
+  if (adminUser.role !== "admin") {
+    return res
+      .status(403)
+      .json({ message: "Only admin can do this operation" });
+  }
+
+  const user = await User.findById(roleChangeId);
+
+  if (!user) {
+    return res.status(404).json({ message: "User can not found" });
+  }
+
+  if (user.role === "admin") {
+    return res
+      .status(400)
+      .json({ message: "One admin can not change other admins role" });
+  }
+
+  user.role = role;
+
+  try {
+    await user.save();
+    res.status(201).json({ message: "User role successfully updated!" });
+  } catch (error: any) {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+    next(error);
+  }
+}
+
+export async function getChangeRole(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = req.userId;
+  const roleChangeId = req.params.userUpdate;
+
+  //ADMIN CHECH
+  const adminUser = await User.findById(userId);
+  if (!adminUser) {
+    return res.status(404).json({ message: "User can not found" });
+  }
+
+  if (adminUser.role !== "admin") {
+    return res
+      .status(403)
+      .json({ message: "Only admin can do this operation" });
+  }
+
+  const existingUser = await User.findById(roleChangeId);
+
+  if (!existingUser) {
+    return res.status(404).json({ message: "User can not found" });
+  }
+
+  return res.status(200).json({
+    message: "User successfully fetched",
+    userRole: existingUser.role,
+  });
+}

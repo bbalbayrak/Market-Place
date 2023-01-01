@@ -1,5 +1,4 @@
 "use strict";
-// import { NextFunction, Request, Response } from "express";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -20,7 +19,6 @@ const verifyToken = (req, res, next) => {
         req.userId = decoded.userId;
     }
     catch (err) {
-        // console.log(err);
         return res.status(401).send("Invalid Token");
     }
     return next();
