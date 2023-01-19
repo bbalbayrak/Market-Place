@@ -21,10 +21,22 @@ const userSchema = new Schema({
     marketName: {
         type: String,
     },
+    cart: {
+        items: [
+            {
+                productId: {
+                    type: Schema.Types.ObjectId,
+                    ref: "Product",
+                    required: true,
+                },
+                quantity: { type: Number, required: true },
+            },
+        ],
+    },
     role: {
         type: String,
         default: "user",
-        enum: ["user", "admin", "marketOwner"],
+        enum: ["user", "admin", "premium", "marketOwner"],
     },
 });
 exports.default = mongoose_1.default.model("User", userSchema);

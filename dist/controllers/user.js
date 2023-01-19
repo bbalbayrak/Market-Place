@@ -12,67 +12,74 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dataSchema = exports.login = exports.signUp = void 0;
+exports.premiumPostCart = exports.postCart = exports.getCart = void 0;
+const product_1 = __importDefault(require("../models/product"));
 const user_1 = __importDefault(require("../models/user"));
-const bcrypt_1 = __importDefault(require("bcrypt"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const zod_1 = require("zod");
-function signUp(req, res, next) {
+function getCart(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const name = req.body.name;
-        const email = req.body.email;
-        const password = req.body.password;
-        const role = req.body.role;
-        const userExisting = yield user_1.default.findOne({ email: email });
-        if (userExisting) {
-            return res.status(500).json({ message: "This email already exist" });
+        const userId = req.userId;
+        const user = yield user_1.default.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User can not found!" });
         }
-        const hashedPasswd = yield bcrypt_1.default.hash(password, 12);
-        const user = new user_1.default({
-            name: name,
-            email: email,
-            password: hashedPasswd,
-            role: role,
-        });
-        yield user.save();
+        const items = user.cart.items;
         return res
             .status(200)
-            .json({ message: "User successfully created", user: user });
+            .json({ message: "There is your cart items", items: items });
     });
 }
-exports.signUp = signUp;
-function login(req, res, next) {
+exports.getCart = getCart;
+function postCart(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const email = req.body.email;
-        const password = req.body.password;
-        const user = yield user_1.default.findOne({ email: email });
+        const userId = req.userId;
+        const productId = req.params.productId;
+        const user = yield user_1.default.findById(userId);
         if (!user) {
-            return res.status(500).json({ message: "Wrong E-mail!" });
+            return res.status(404).json({ message: "User can not found!" });
         }
-        const equalPasswd = yield bcrypt_1.default.compare(password, user.password);
-        if (!equalPasswd) {
-            return res.status(500).json({ message: "Wrong Password !" });
-        }
-        //JWT
-        const token = jsonwebtoken_1.default.sign({ email: email, userId: user._id.toString() }, process.env.SECRET_KEY, { expiresIn: "1h" });
-        res.status(200).json({ token: token, userId: user._id.toString() });
+        const userProduct = yield product_1.default.findById(productId);
+        const addToCart = (product) => {
+            const cartProductIndex = user.cart.items.findIndex((cp) => {
+                return cp.productId.toString() === product._id.toString();
+            });
+            let newQuantity = 1;
+            const updatedCartItems = [...user.cart.items];
+            if (cartProductIndex >= 0) {
+                newQuantity = user.cart.items[cartProductIndex].quantity + 1;
+                updatedCartItems[cartProductIndex].quantity = newQuantity;
+            }
+            else {
+                updatedCartItems.push({
+                    productId: product._id,
+                    quantity: newQuantity,
+                });
+            }
+            //ONLY PREMIUM
+            if (user.role !== "premium" &&
+                user.cart.items[cartProductIndex].quantity === 3) {
+                return res
+                    .status(400)
+                    .json({ message: "Only premium users can buy more than 3 products" });
+            }
+            const updatedCart = { items: updatedCartItems };
+            user.cart = updatedCart;
+            return user.save();
+        };
+        addToCart(userProduct);
+        return res
+            .status(201)
+            .json({ message: "Added to cart !", cartItems: user.cart.items });
     });
 }
-exports.login = login;
-exports.dataSchema = zod_1.z.object({
-    body: zod_1.z.object({
-        name: zod_1.z.string({
-            required_error: "Name is required !",
-        }),
-        email: zod_1.z
-            .string({
-            required_error: "Email is required !",
-        })
-            .email({ message: "Must be a valid email" }),
-        password: zod_1.z
-            .string({
-            required_error: "Password is required !",
-        })
-            .min(5),
-    }),
-});
+exports.postCart = postCart;
+function premiumPostCart(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const productId = req.params.productId;
+        const userId = req.userId;
+        const user = yield user_1.default.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User can not found !" });
+        }
+    });
+}
+exports.premiumPostCart = premiumPostCart;

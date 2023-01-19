@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 
 const Schema = mongoose.Schema;
 
@@ -8,6 +8,11 @@ interface IUser {
   password: string;
   role: string;
   marketName: string;
+  cart: ICart;
+}
+
+interface ICart {
+  items: any;
 }
 
 const userSchema = new Schema<IUser>({
@@ -26,10 +31,22 @@ const userSchema = new Schema<IUser>({
   marketName: {
     type: String,
   },
+  cart: {
+    items: [
+      {
+        productId: {
+          type: Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        quantity: { type: Number, required: true },
+      },
+    ],
+  },
   role: {
     type: String,
     default: "user",
-    enum: ["user", "admin", "marketOwner"],
+    enum: ["user", "admin", "premium", "marketOwner"],
   },
 });
 
