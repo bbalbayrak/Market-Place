@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.premiumPostCart = exports.postCart = exports.getCart = void 0;
+exports.deleteCart = exports.postCart = exports.getCart = void 0;
 const product_1 = __importDefault(require("../models/product"));
 const user_1 = __importDefault(require("../models/user"));
 function getCart(req, res, next) {
@@ -72,7 +72,7 @@ function postCart(req, res, next) {
     });
 }
 exports.postCart = postCart;
-function premiumPostCart(req, res, next) {
+function deleteCart(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const productId = req.params.productId;
         const userId = req.userId;
@@ -80,6 +80,35 @@ function premiumPostCart(req, res, next) {
         if (!user) {
             return res.status(404).json({ message: "User can not found !" });
         }
+        const deleteCart = function () {
+            // const existingItem = user.cart.items.findIndex((p: any) => {
+            //   return p.productId.toString() === productId;
+            // });
+            // const updatedCartItems = [...user.cart.items];
+            // if (existingItem >= 0) {
+            //   return user.cart.items[existingItem].quantity - 1;
+            // }
+            // const selectedItem = user.cart.items.filter((item: any) => {
+            //   let deletedQuantity = 1;
+            //   if (item.productId.toString() === productId) {
+            //     return item.quantity;
+            //   }
+            //   if (item.quantity === 1) {
+            //     return user.cart.items.filter((p: any) => {
+            //       return p.productId.toString() !== productId;
+            //     });
+            //   }
+            // });
+            const deletedItem = user.cart.items.filter((item) => {
+                return item.productId.toString() !== productId;
+            });
+            user.cart.items = deletedItem;
+            return user.save();
+        };
+        deleteCart();
+        return res
+            .status(201)
+            .json({ message: "Cart successfully deleted !", cart: user.cart.items });
     });
 }
-exports.premiumPostCart = premiumPostCart;
+exports.deleteCart = deleteCart;

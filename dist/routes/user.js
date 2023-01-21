@@ -26,4 +26,6 @@ router.delete("/market/:marketOwnerId", authCheck_1.default, marketOwner_1.delet
 router.get("/cart", authCheck_1.default, user_1.getCart);
 //Add To Cart
 router.post("/cart/:productId", authCheck_1.default, user_1.postCart);
+//Delete Cart
+router.delete("/cart/:productId", authCheck_1.default, user_1.deleteCart);
 exports.default = router;

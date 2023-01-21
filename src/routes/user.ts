@@ -7,7 +7,7 @@ import {
   hasMarket,
   updateMarket,
 } from "../controllers/marketOwner";
-import { getCart, postCart } from "../controllers/user";
+import { deleteCart, getCart, postCart } from "../controllers/user";
 
 const router = Router();
 
@@ -35,5 +35,8 @@ router.get("/cart", verifyToken, getCart);
 
 //Add To Cart
 router.post("/cart/:productId", verifyToken, postCart);
+
+//Delete Cart
+router.delete("/cart/:productId", verifyToken, deleteCart);
 
 export default router;

@@ -71,7 +71,7 @@ export async function postCart(
     .json({ message: "Added to cart !", cartItems: user.cart.items });
 }
 
-export async function premiumPostCart(
+export async function deleteCart(
   req: Request,
   res: Response,
   next: NextFunction
@@ -84,4 +84,42 @@ export async function premiumPostCart(
   if (!user) {
     return res.status(404).json({ message: "User can not found !" });
   }
+
+  const deleteCart = function () {
+    // const existingItem = user.cart.items.findIndex((p: any) => {
+    //   return p.productId.toString() === productId;
+    // });
+
+    // const updatedCartItems = [...user.cart.items];
+
+    // if (existingItem >= 0) {
+    //   return user.cart.items[existingItem].quantity - 1;
+    // }
+
+    // const selectedItem = user.cart.items.filter((item: any) => {
+    //   let deletedQuantity = 1;
+    //   if (item.productId.toString() === productId) {
+    //     return item.quantity;
+    //   }
+    //   if (item.quantity === 1) {
+    //     return user.cart.items.filter((p: any) => {
+    //       return p.productId.toString() !== productId;
+    //     });
+    //   }
+    // });
+
+    const deletedItem = user.cart.items.filter((item: any) => {
+      return item.productId.toString() !== productId;
+    });
+
+    user.cart.items = deletedItem;
+
+    return user.save();
+  };
+
+  deleteCart();
+
+  return res
+    .status(201)
+    .json({ message: "Cart successfully deleted !", cart: user.cart.items });
 }
