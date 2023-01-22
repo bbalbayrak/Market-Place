@@ -56,7 +56,7 @@ function postCart(req, res, next) {
             }
             //ONLY PREMIUM
             if (user.role !== "premium" &&
-                user.cart.items[cartProductIndex].quantity === 3) {
+                user.cart.items[cartProductIndex].quantity > 3) {
                 return res
                     .status(400)
                     .json({ message: "Only premium users can buy more than 3 products" });

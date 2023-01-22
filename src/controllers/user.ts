@@ -52,7 +52,7 @@ export async function postCart(
     //ONLY PREMIUM
     if (
       user.role !== "premium" &&
-      user.cart.items[cartProductIndex].quantity === 3
+      user.cart.items[cartProductIndex].quantity > 3
     ) {
       return res
         .status(400)
