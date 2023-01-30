@@ -9,10 +9,14 @@ interface IUser {
   role: string;
   marketName: string;
   cart: ICart;
+  favorites: IFavorites;
 }
 
 interface ICart {
   items: any;
+}
+interface IFavorites {
+  favoriteItems: any;
 }
 
 const userSchema = new Schema<IUser>({
@@ -47,6 +51,17 @@ const userSchema = new Schema<IUser>({
     type: String,
     default: "user",
     enum: ["user", "admin", "premium", "marketOwner"],
+  },
+  favorites: {
+    favoriteItems: [
+      {
+        productId: {
+          type: Schema.Types.ObjectId,
+          required: true,
+          ref: "Product",
+        },
+      },
+    ],
   },
 });
 

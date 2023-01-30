@@ -28,4 +28,8 @@ router.get("/cart", authCheck_1.default, user_1.getCart);
 router.post("/cart/:productId", authCheck_1.default, user_1.postCart);
 //Delete Cart
 router.delete("/cart/:productId", authCheck_1.default, user_1.deleteCart);
+//Add Favorite Product
+router.post("/favorite/:productId", authCheck_1.default, user_1.addFavorite);
+//Get Favorite Product
+router.get("/favorite", authCheck_1.default, user_1.getFavotire);
 exports.default = router;

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCart = exports.postCart = exports.getCart = void 0;
+exports.addFavorite = exports.getFavotire = exports.deleteCart = exports.postCart = exports.getCart = void 0;
 const product_1 = __importDefault(require("../models/product"));
 const user_1 = __importDefault(require("../models/user"));
 function getCart(req, res, next) {
@@ -112,3 +112,64 @@ function deleteCart(req, res, next) {
     });
 }
 exports.deleteCart = deleteCart;
+function getFavotire(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const userId = req.userId;
+        const user = yield user_1.default.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User can not found !" });
+        }
+        if (user.role === "marketOwner") {
+            return res
+                .status(403)
+                .json({ message: "Market Owners can not do this operation." });
+        }
+        const favorites = user.favorites;
+        return res
+            .status(200)
+            .json({ message: "Here is your favorite products", favorites: favorites });
+    });
+}
+exports.getFavotire = getFavotire;
+function addFavorite(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const userId = req.userId;
+        const productId = req.params.productId;
+        const user = yield user_1.default.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User can not found !" });
+        }
+        if (user.role === "marketowner") {
+            return res
+                .status(403)
+                .json({ message: "Market owner can not do this operation." });
+        }
+        const selectedProduct = yield product_1.default.findById(productId);
+        const addToFavorites = (product) => {
+            const existingProduct = user.favorites.favoriteItems.findIndex((p) => {
+                return p.productId.toString() === product._id.toString();
+            });
+            const favoriteProducts = [...user.favorites.favoriteItems];
+            if (existingProduct >= 0) {
+                return res
+                    .status(403)
+                    .json({ message: "You can not add same product to favorite." });
+            }
+            else {
+                favoriteProducts.push({
+                    productId: product._id,
+                });
+            }
+            const updatedFavorites = { favoriteItems: favoriteProducts };
+            user.favorites = updatedFavorites;
+            return user.save();
+        };
+        addToFavorites(selectedProduct);
+        const favorites = user.favorites.favoriteItems;
+        return res.status(201).json({
+            message: "Favorite product successfully added your favorites.",
+            favorites: favorites,
+        });
+    });
+}
+exports.addFavorite = addFavorite;

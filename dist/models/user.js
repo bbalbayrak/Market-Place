@@ -38,5 +38,16 @@ const userSchema = new Schema({
         default: "user",
         enum: ["user", "admin", "premium", "marketOwner"],
     },
+    favorites: {
+        favoriteItems: [
+            {
+                productId: {
+                    type: Schema.Types.ObjectId,
+                    required: true,
+                    ref: "Product",
+                },
+            },
+        ],
+    },
 });
 exports.default = mongoose_1.default.model("User", userSchema);

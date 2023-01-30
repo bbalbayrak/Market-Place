@@ -7,7 +7,13 @@ import {
   hasMarket,
   updateMarket,
 } from "../controllers/marketOwner";
-import { deleteCart, getCart, postCart } from "../controllers/user";
+import {
+  addFavorite,
+  deleteCart,
+  getCart,
+  getFavotire,
+  postCart,
+} from "../controllers/user";
 
 const router = Router();
 
@@ -38,5 +44,11 @@ router.post("/cart/:productId", verifyToken, postCart);
 
 //Delete Cart
 router.delete("/cart/:productId", verifyToken, deleteCart);
+
+//Add Favorite Product
+router.post("/favorite/:productId", verifyToken, addFavorite);
+
+//Get Favorite Product
+router.get("/favorite", verifyToken, getFavotire);
 
 export default router;

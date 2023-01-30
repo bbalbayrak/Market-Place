@@ -123,3 +123,82 @@ export async function deleteCart(
     .status(201)
     .json({ message: "Cart successfully deleted !", cart: user.cart.items });
 }
+
+export async function getFavotire(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = req.userId;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({ message: "User can not found !" });
+  }
+
+  if (user.role === "marketOwner") {
+    return res
+      .status(403)
+      .json({ message: "Market Owners can not do this operation." });
+  }
+
+  const favorites = user.favorites;
+
+  return res
+    .status(200)
+    .json({ message: "Here is your favorite products", favorites: favorites });
+}
+
+export async function addFavorite(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = req.userId;
+  const productId = req.params.productId;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({ message: "User can not found !" });
+  }
+
+  if (user.role === "marketowner") {
+    return res
+      .status(403)
+      .json({ message: "Market owner can not do this operation." });
+  }
+
+  const selectedProduct = await Product.findById(productId);
+
+  const addToFavorites = (product: any) => {
+    const existingProduct = user.favorites.favoriteItems.findIndex((p: any) => {
+      return p.productId.toString() === product._id.toString();
+    });
+    const favoriteProducts = [...user.favorites.favoriteItems];
+
+    if (existingProduct >= 0) {
+      return res
+        .status(403)
+        .json({ message: "You can not add same product to favorite." });
+    } else {
+      favoriteProducts.push({
+        productId: product._id,
+      });
+    }
+
+    const updatedFavorites = { favoriteItems: favoriteProducts };
+    user.favorites = updatedFavorites;
+    return user.save();
+  };
+
+  addToFavorites(selectedProduct);
+
+  const favorites = user.favorites.favoriteItems;
+
+  return res.status(201).json({
+    message: "Favorite product successfully added your favorites.",
+    favorites: favorites,
+  });
+}
