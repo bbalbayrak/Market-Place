@@ -202,3 +202,43 @@ export async function addFavorite(
     favorites: favorites,
   });
 }
+
+export async function deleteFavorite(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = req.userId;
+  const productId = req.params.productId;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({ message: "User can not found !" });
+  }
+
+  const isFavoriteEmpty = user.favorites.favoriteItems.findIndex((fav: any) => {
+    return fav.productId.toString() === productId;
+  });
+
+  if (isFavoriteEmpty === 0 || isFavoriteEmpty === -1) {
+    return res
+      .status(400)
+      .json({ message: "Selected item is not your favorite !" });
+  }
+
+  const deleteFav = function () {
+    const deletedFav = user.favorites.favoriteItems.filter((fav: any) => {
+      return fav.productId.toString() !== productId;
+    });
+
+    user.favorites.favoriteItems = deletedFav;
+    user.save();
+  };
+
+  deleteFav();
+  return res.status(201).json({
+    message: "Selected favorite item successfully deleted",
+    favorites: user.favorites.favoriteItems,
+  });
+}

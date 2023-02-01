@@ -10,6 +10,7 @@ import {
 import {
   addFavorite,
   deleteCart,
+  deleteFavorite,
   getCart,
   getFavotire,
   postCart,
@@ -45,10 +46,13 @@ router.post("/cart/:productId", verifyToken, postCart);
 //Delete Cart
 router.delete("/cart/:productId", verifyToken, deleteCart);
 
+//Get Favorite Product
+router.get("/favorite", verifyToken, getFavotire);
+
 //Add Favorite Product
 router.post("/favorite/:productId", verifyToken, addFavorite);
 
-//Get Favorite Product
-router.get("/favorite", verifyToken, getFavotire);
+//Delete Favorite Product
+router.delete("/favorite/:productId", verifyToken, deleteFavorite);
 
 export default router;

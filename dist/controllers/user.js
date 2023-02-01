@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addFavorite = exports.getFavotire = exports.deleteCart = exports.postCart = exports.getCart = void 0;
+exports.deleteFavorite = exports.addFavorite = exports.getFavotire = exports.deleteCart = exports.postCart = exports.getCart = void 0;
 const product_1 = __importDefault(require("../models/product"));
 const user_1 = __importDefault(require("../models/user"));
 function getCart(req, res, next) {
@@ -173,3 +173,34 @@ function addFavorite(req, res, next) {
     });
 }
 exports.addFavorite = addFavorite;
+function deleteFavorite(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const userId = req.userId;
+        const productId = req.params.productId;
+        const user = yield user_1.default.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User can not found !" });
+        }
+        const isFavoriteEmpty = user.favorites.favoriteItems.findIndex((fav) => {
+            return fav.productId.toString() === productId;
+        });
+        if (isFavoriteEmpty === 0 || isFavoriteEmpty === -1) {
+            return res
+                .status(400)
+                .json({ message: "Selected item is not your favorite !" });
+        }
+        const deleteFav = function () {
+            const deletedFav = user.favorites.favoriteItems.filter((fav) => {
+                return fav.productId.toString() !== productId;
+            });
+            user.favorites.favoriteItems = deletedFav;
+            user.save();
+        };
+        deleteFav();
+        return res.status(201).json({
+            message: "Selected favorite item successfully deleted",
+            favorites: user.favorites.favoriteItems,
+        });
+    });
+}
+exports.deleteFavorite = deleteFavorite;
