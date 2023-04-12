@@ -34,10 +34,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use("/auth", userRoute);
-// app.use((req, res, next) => {
-//   res.send("dfsdfsdf");
-//   next();
-// });
+
 
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   console.log(error);
